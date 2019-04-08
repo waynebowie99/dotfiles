@@ -5,13 +5,15 @@ set nocompatible
 filetype plugin indent on
 
 "Plugins
-call plug#begin()
+call plug#begin("~/.config/nvim")
 
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
 Plug 'scrooloose/nerdcommenter'
+
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+
 Plug 'majutsushi/tagbar'
 Plug 'sheerun/vim-polyglot'
 Plug 'Yggdroot/indentLine'
@@ -24,10 +26,22 @@ Plug 'ludovicchabant/vim-gutentags'
 Plug 'rstacruz/vim-closer'
 Plug 'takac/vim-hardtime'
 
+" Window management
+Plug 'wesQ3/vim-windowswap'
+Plug 'simeji/winresizer'
+
+" Movement
+Plug 'justinmk/vim-sneak'
+
+
+" Font size
+Plug 'drmikehenry/vim-fontsize'
+
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'Shougo/denite.nvim'
 Plug 'Shougo/neosnippet.vim'
 Plug 'Shougo/neosnippet-snippets'
+Plug 'Shougo/neoyank.vim'
 
 Plug 'ryanoasis/vim-devicons'
 Plug 'sbdchd/neoformat'
@@ -41,7 +55,7 @@ Plug 'harenome/vim-mipssyntax'
 call plug#end()
 
 "Airline
-let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled = 0
 let g:airline_detect_modified=1
 let g:airline_detect_spell=1
 let g:airline#extensions#syntastic#enabled = 1
@@ -80,6 +94,7 @@ let g:syntastic_java_javac_config_file_enabled = 1
 let g:syntastic_auto_loc_list = 0
 
 "Deoplete
+let g:python3_host_prog = "C:/Python37/python.exe"
 let g:deoplete#enable_at_startup = 1
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
@@ -109,9 +124,15 @@ nnoremap <leader>K :DeniteCursorWord help<CR>
 nnoremap <leader>R :Denite file_mru<CR>
 nnoremap <leader>Y :DeniteCursorWord neoyank<CR>
 nnoremap <leader>y :Denite neoyank<CR>
+nnoremap <C-p> :Denite file_rec<CR>
+nnoremap <leader>/ :Denite grep:.<CR>
+call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>', 'noremap')
+call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
+call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>', 'noremap')
+call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
 
 " Hardtime
-let g:hardtime_default_on = 1
+let g:hardtime_default_on = 0
 
 "Window Movement
 nnoremap <C-J> <C-W><C-J>
@@ -133,9 +154,11 @@ nnoremap <silent> <F2> mz:let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :n
 " Fix tab
 nnoremap <silent> <F3> mzgg=G`z
 " Remove ^M
-nnoremap <silent> <F4> :s///<CR>
+nnoremap <silent> <F4> :s///<CR>
+" Run makefile
+nnoremap <silent> <F5> :make<CR>
 " Reload file
-nnoremap <silent> <F5> :e %<CR>
+nnoremap <silent> <F6> :e %<CR>
 
 "General
 set backupdir=~/.config/nvim/backup,.
@@ -164,4 +187,4 @@ set guioptions-=r
 set guioptions-=L
 set ignorecase
 set nohlsearch
-set foldmethod=manual
+set foldmethod=indent

@@ -1,14 +1,13 @@
-" Space as leader
+"Space as lear
 let mapleader=" "
 
 set nocompatible
 filetype plugin indent on
 
 "Plugins
-call plug#begin("~/.config/nvim")
+call plug#begin()
 
 Plug 'scrooloose/nerdtree'
-Plug 'scrooloose/syntastic'
 Plug 'scrooloose/nerdcommenter'
 
 Plug 'vim-airline/vim-airline'
@@ -24,7 +23,15 @@ Plug 'godlygeek/tabular'
 Plug 'tpope/vim-fugitive'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'rstacruz/vim-closer'
-Plug 'takac/vim-hardtime'
+
+Plug 'junegunn/fzf'
+
+" Syntax
+Plug 'w0rp/ale'
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
 
 " Window management
 Plug 'wesQ3/vim-windowswap'
@@ -32,7 +39,6 @@ Plug 'simeji/winresizer'
 
 " Movement
 Plug 'justinmk/vim-sneak'
-
 
 " Font size
 Plug 'drmikehenry/vim-fontsize'
@@ -55,12 +61,11 @@ Plug 'harenome/vim-mipssyntax'
 call plug#end()
 
 "Airline
-let g:airline#extensions#tabline#enabled = 0
+let g:airline#extensions#tabline#enabled = 1
 let g:airline_detect_modified=1
 let g:airline_detect_spell=1
-let g:airline#extensions#syntastic#enabled = 1
+let g:airline#extensions#ale#enabled = 1
 let g:airline#extensions#wordcount#enabled = 1
-let g:airline#extensions#whitespace#enabled = 1
 let g:airline#extensions#whitespace#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail'
@@ -81,20 +86,21 @@ vmap <leader>a<space> :Tab /
 nmap <leader>a/ :%Tab /\/\/<CR>
 vmap <leader>a/ :Tab /\/\/<CR>
 
-"Syntastic settings
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-let g:syntastic_always_populate_loc_list  = 1
-let g:syntastic_auto_loc_list             = 1
-let g:syntastic_check_on_open             = 1
-let g:syntastic_check_on_wq               = 0
-let g:syntastic_enable_signs              = 1
-let g:syntastic_java_javac_config_file_enabled = 1
-let g:syntastic_auto_loc_list = 0
+" Ale
+let g:ale_completion_enabled = 1
+let g:ale_fix_on_save = 1
+let g:ale_java_javac_classpath = '~/Programming/Java/'
+let g:ale_fixers = {
+\   'java':['google_java_format', 'uncrustify', 'remove_trailing_lines', 'trim_whitespace']
+\}
+
+" Language Server
+nnoremap <F6> :call LanguageClient_contextMenu()<CR>
+let g:LanguageClient_serverCommands = {
+    \ 'java': ['/usr/local/bin/jdtls', '-data', getcwd()],
+    \ }
 
 "Deoplete
-let g:python3_host_prog = "C:/Python37/python.exe"
 let g:deoplete#enable_at_startup = 1
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
@@ -112,10 +118,6 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 " Ctrl-b to open Tagbar
 map <C-b> :TagbarToggle<CR>
 
-" Tmux
-" Write all buffers before navigating from Vim to tmux pane
-let g:tmux_navigator_save_on_switch = 2
-
 " Denite
 nnoremap <leader>: :Denite command<CR>
 nnoremap <leader>" :Denite register<CR>
@@ -130,9 +132,6 @@ call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>', 'noremap
 call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
 call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>', 'noremap')
 call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
-
-" Hardtime
-let g:hardtime_default_on = 0
 
 "Window Movement
 nnoremap <C-J> <C-W><C-J>
@@ -153,12 +152,10 @@ nmap , za
 nnoremap <silent> <F2> mz:let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>`z
 " Fix tab
 nnoremap <silent> <F3> mzgg=G`z
-" Remove ^M
-nnoremap <silent> <F4> :s///<CR>
 " Run makefile
-nnoremap <silent> <F5> :make<CR>
+nnoremap <silent> <F4> :make<CR>
 " Reload file
-nnoremap <silent> <F6> :e %<CR>
+nnoremap <silent> <F5> :e %<CR>
 
 "General
 set backupdir=~/.config/nvim/backup,.

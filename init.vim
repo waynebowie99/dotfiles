@@ -151,6 +151,9 @@ autocmd FileType * call LC_maps()
 
 "Deoplete
 let g:deoplete#enable_at_startup = 1
+if has('win32')
+    let g:python3_host_prog='C:\Python37\python.exe'
+endif
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 

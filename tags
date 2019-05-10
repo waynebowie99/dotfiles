@@ -1,0 +1,74 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/45968eff/
+,	init.vim	/^    nmap , za$/;"	m
+<C-H>	init.vim	/^    nnoremap <C-H> <C-W><C-H>$/;"	m
+<C-J>	init.vim	/^    nnoremap <C-J> <C-W><C-J>$/;"	m
+<C-K>	init.vim	/^    nnoremap <C-K> <C-W><C-K>$/;"	m
+<C-L>	init.vim	/^    nnoremap <C-L> <C-W><C-L>$/;"	m
+<C-b>	init.vim	/^        map <C-b> :TagbarToggle<CR>$/;"	m
+<C-k>	init.vim	/^        imap <C-k>     <Plug>(neosnippet_expand_or_jump)$/;"	m
+<C-k>	init.vim	/^        smap <C-k>     <Plug>(neosnippet_expand_or_jump)$/;"	m
+<C-k>	init.vim	/^        xmap <C-k>     <Plug>(neosnippet_expand_target)$/;"	m
+<C-p>	init.vim	/^        map <C-p> :Files<CR>$/;"	m
+<F2>	init.vim	/^                nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>$/;"	m
+<F3>	init.vim	/^    nnoremap <silent> <F3> mzgg=G`zzz$/;"	m
+<F4>	init.vim	/^    nnoremap <silent> <F4> :make<CR>$/;"	m
+<F5>	init.vim	/^    nnoremap <silent> <F5> :e %<CR>$/;"	m
+<F6>	init.vim	/^        nnoremap <F6> :call LanguageClient_contextMenu()<CR>$/;"	m
+<S-Tab>	init.vim	/^        inoremap <S-Tab> <C-V><Tab>$/;"	m
+<S-Tab>	init.vim	/^        inoremap <expr> <S-Tab> pumvisible() ? "\\<C-p>" : "\\<S-Tab>"$/;"	m
+<TAB>	init.vim	/^        smap <expr><TAB> neosnippet#expandable_or_jumpable() ?$/;"	m
+<Tab>	init.vim	/^        inoremap <expr> <Tab> pumvisible() ? "\\<C-n>" : "\\<Tab>"$/;"	m
+<leader>"	init.vim	/^        nnoremap <leader>" :Denite register<CR>$/;"	m
+<leader>/	init.vim	/^        nnoremap <leader>\/ :Denite grep:.<CR>$/;"	m
+<leader>:	init.vim	/^        nnoremap <leader>: :Denite command<CR>$/;"	m
+<leader>R	init.vim	/^        nnoremap <leader>R :Denite file_mru<CR>$/;"	m
+<leader>b	init.vim	/^        nnoremap <leader>b :Denite buffer:!<CR>$/;"	m
+<leader>n	init.vim	/^        nmap <leader>n :NERDTreeToggle<CR>$/;"	m
+<leader>q	init.vim	/^    nmap <leader>q :q!<CR>$/;"	m
+<leader>s	init.vim	/^    nmap <leader>s :w!<CR>$/;"	m
+InstallMyPlugs	init.vim	/^      function! InstallMyPlugs() abort$/;"	f
+K	init.vim	/^                nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>$/;"	m
+LC_maps	init.vim	/^        function LC_maps()$/;"	f
+PluginInstallation	init.vim	/^      augroup PluginInstallation$/;"	a
+VimPlugInitialized	init.vim	/^      let VimPlugInitialized=0$/;"	v
+VimPlugInitialized	init.vim	/^    let VimPlugInitialized=1$/;"	v
+g:LanguageClient_serverCommands	init.vim	/^        let g:LanguageClient_serverCommands = {$/;"	v
+g:airline#extensions#ale#enabled	init.vim	/^        let g:airline#extensions#ale#enabled = 1$/;"	v
+g:airline#extensions#tabline#buffer_nr_show	init.vim	/^        let g:airline#extensions#tabline#buffer_nr_show = 1$/;"	v
+g:airline#extensions#tabline#enabled	init.vim	/^        let g:airline#extensions#tabline#enabled = 1$/;"	v
+g:airline#extensions#tabline#formatter	init.vim	/^        let g:airline#extensions#tabline#formatter = 'unique_tail'$/;"	v
+g:airline#extensions#whitespace#enabled	init.vim	/^        let g:airline#extensions#whitespace#enabled = 1$/;"	v
+g:airline#extensions#wordcount#enabled	init.vim	/^        let g:airline#extensions#wordcount#enabled = 1$/;"	v
+g:airline_detect_modified	init.vim	/^        let g:airline_detect_modified=1$/;"	v
+g:airline_detect_spell	init.vim	/^        let g:airline_detect_spell=1$/;"	v
+g:airline_powerline_fonts	init.vim	/^        let g:airline_powerline_fonts = 1$/;"	v
+g:ale_completion_enabled	init.vim	/^        let g:ale_completion_enabled = 1$/;"	v
+g:ale_fix_on_save	init.vim	/^        let g:ale_fix_on_save = 1$/;"	v
+g:ale_fixers	init.vim	/^        let g:ale_fixers = {$/;"	v
+g:deoplete#enable_at_startup	init.vim	/^        let g:deoplete#enable_at_startup = 1$/;"	v
+g:neosnippet#enable_snipmate_compatibility	init.vim	/^        let g:neosnippet#enable_snipmate_compatibility = 1$/;"	v
+g:neosnippet#snippets_directory	init.vim	/^        let g:neosnippet#snippets_directory = '~\/.config\/nvim\/plugged\/neosnippet-snippets\/n/;"	v
+g:python3_host_prog	init.vim	/^            let g:python3_host_prog='C:\\Python37\\python.exe'$/;"	v
+g:userDirectory	init.vim	/^            let g:userDirectory = "~\/.config\/nvim"$/;"	v
+g:userDirectory	init.vim	/^            let g:userDirectory = "~\/.vim"$/;"	v
+g:userDirectory	init.vim	/^            let g:userDirectory = "~\\AppData\\Local\\nvim"$/;"	v
+g:userDirectory	init.vim	/^            let g:userDirectory = "~\\vimfiles"$/;"	v
+g:vimDirectory	init.vim	/^            let g:vimDirectory = "~\/.local\/share\/nvim\/site"$/;"	v
+g:vimDirectory	init.vim	/^            let g:vimDirectory = "~\/.vim"$/;"	v
+g:vimDirectory	init.vim	/^            let g:vimDirectory = "~\\AppData\\Local\\nvim"$/;"	v
+g:vimDirectory	init.vim	/^            let g:vimDirectory = "~\\vimfiles"$/;"	v
+gd	init.vim	/^                nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>$/;"	m
+jk	init.vim	/^    inoremap jk <ESC>$/;"	m
+kj	init.vim	/^    inoremap kj <ESC>$/;"	m
+mapleader	init.vim	/^let mapleader=" "$/;"	v
+omnisharp_commands	init.vim	/^        augroup omnisharp_commands$/;"	a
+s:mv	init.vim	/^          let s:mv="move "$/;"	v
+s:mv	init.vim	/^          let s:mv="mv "$/;"	v
+s:rm	init.vim	/^          let s:rm="del "$/;"	v
+s:rm	init.vim	/^          let s:rm="rm -rf "$/;"	v

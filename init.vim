@@ -9,66 +9,9 @@ filetype plugin indent on
             let g:vimDirectory = "~/.local/share/nvim/site"
             let g:userDirectory = "~/.config/nvim"
         elseif has("win32") || has("win32unix")
-            let g:vimDirectory = "~\AppData\Local\nvim"
-            let g:userDirectory = "~\AppData\Local\nvim"
+            let g:vimDirectory  = 'C:\Users\'. $username. '\AppData\Local\nvim'
+            let g:userDirectory = g:vimDirectory
         end
-    else
-        if has("unix")
-            let g:vimDirectory = "~/.vim"
-            let g:userDirectory = "~/.vim"
-        elseif has("win32") || has("win32unix")
-            let g:vimDirectory = "~\vimfiles"
-            let g:userDirectory = "~\vimfiles"
-        endif
-    endif
-" }
-
-""" Plugin Manager: (Vim-Plug)
-    let VimPlugInitialized=1
-    " Download plugin manager {
-    if empty(glob(expand(g:vimDirectory . '/autoload/plug.vim')))
-      let VimPlugInitialized=0
-      " I know that all these could be replaced with just the git one. But I don't want to delete them
-      if executable("curl")
-        silent exec '!curl -fLo ' . shellescape(expand(g:vimDirectory."/autoload/plug.vim")) .
-            \ ' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-      " If all else fails we can just use git.
-      elseif executable("git")
-        silent exec '!git clone -q --depth=1 git@github.com:junegunn/vim-plug.git ' . shellescape(expand(g:vimDirectory."/temp"))
-        if has('gui_win32')
-          let s:mv="move "
-          let s:rm="del "
-        else
-          let s:mv="mv "
-          let s:rm="rm -rf "
-        endif
-        silent exec '!' . s:mv . shellescape(expand(g:vimDirectory."/temp/plug.vim")) .
-          \ ' ' . shellescape(expand(g:vimDirectory."/autoload/plug.vim"))
-        silent exec '!' . s:rm . shellescape(expand(g:vimDirectory."/temp/"))
-      else
-        echo "Couldn't find a way to download Vim-Plug. Not sure how you were planning" .
-          \ " installing plugins without Git."
-      endif
-
-      if has('nvim')
-        " Install python client
-        if HasExec('pip')
-          silent exec '!pip install neovim'
-        endif
-        if HasExec('pip3')
-          silent exec '!pip3 install neovim'
-        endif
-      endif
-      function! InstallMyPlugs() abort
-        silent! PlugUpdate
-        if has('nvim')
-          silent! UpdateRemotePlugins
-        endif
-      endfunction
-      augroup PluginInstallation
-        autocmd!
-        autocmd VimEnter * call InstallMyPlugs()
-      augroup END
     endif
 " }
 
@@ -79,15 +22,24 @@ filetype plugin indent on
     " Airline: {
         Plug 'vim-airline/vim-airline'
         Plug 'vim-airline/vim-airline-themes'
-        let g:airline#extensions#tabline#enabled = 1
-        let g:airline_detect_modified=1
-        let g:airline_detect_spell=1
-        let g:airline#extensions#ale#enabled = 1
-        let g:airline#extensions#wordcount#enabled = 1
-        let g:airline#extensions#whitespace#enabled = 1
-        let g:airline#extensions#tabline#buffer_nr_show = 1
-        let g:airline#extensions#tabline#formatter = 'unique_tail'
+
+        if has("unix")
+            let g:airline#extensions#tabline#enabled = 1
+        endif
+
+        let g:airline_detect_modified= 1
+        let g:airline_detect_spell= 0
         let g:airline_powerline_fonts = 1
+        let g:airline#extensions#wordcount#enabled = 0
+        let g:airline#extensions#whitespace#enabled = 0
+
+        let g:airline#extensions#ale#enabled = 1
+
+        let g:airline#extensions#tabline#buffer_nr_show = 0
+        let g:airline#extensions#tabline#formatter = 'unique_tail'
+
+        let g:airline#extensions#languageclient#enabled = 0
+        let g:airline#extensions#neomake#enabled = 0
         set laststatus=2
     " }
     " Themeing: {
@@ -100,35 +52,40 @@ filetype plugin indent on
 
         let g:ale_completion_enabled = 1
         let g:ale_fix_on_save = 1
-        "let g:ale_java_javac_classpath = '~/Programming/Java/'
+        let g:ale_linters = {
+                    \   'cs':['OmniSharp']
+                    \}
         let g:ale_fixers = {
-                    \   'java':['google_java_format', 'uncrustify', 'remove_trailing_lines', 'trim_whitespace'],
-                    \   'json':['prettier', 'remove_trailing_lines', 'trim_whitespace'],
-                    \   '': ['remove_trailing_lines', 'trim_whitespace']
+                    \   '*':['trim_whitespace', 'remove_trailing_lines'],
+                    \   'html':['prettier', 'trim_whitespace', 'remove_trailing_lines'],
+                    \   'cs':['uncrustify', 'trim_whitespace', 'remove_trailing_lines'],
+                    \   'java':['uncrustify', 'trim_whitespace', 'remove_trailing_lines'],
+                    \   'json':['prettier', 'trim_whitespace', 'remove_trailing_lines'],
                     \}
     " }
     " Deoplete: {
-        Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+        Plug 'Shougo/deoplete.nvim'
 
         let g:deoplete#enable_at_startup = 1
+        let g:deoplete#auto_complete_start_length = 1
         if has('win32')
             let g:python3_host_prog='C:\Python37\python.exe'
         endif
+
         inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
         inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
     " }
     " Denite: {
-        Plug 'Shougo/denite.nvim', { 'on': 'Denite' }
+        Plug 'Shougo/denite.nvim'
 
         nnoremap <leader>: :Denite command<CR>
         nnoremap <leader>" :Denite register<CR>
         nnoremap <leader>b :Denite buffer:!<CR>
         nnoremap <leader>R :Denite file_mru<CR>
         nnoremap <leader>/ :Denite grep:.<CR>
-        call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>', 'noremap')
-        call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
-        call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>', 'noremap')
-        call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
+    " }
+    " Emmet: {
+        Plug 'mattn/emmet-vim'
     " }
     " NeoSnippet: {
         Plug 'Shougo/neosnippet.vim'
@@ -147,10 +104,26 @@ filetype plugin indent on
         Plug 'autozimu/LanguageClient-neovim', {
                     \ 'branch': 'future',
                     \ 'do': 'bash install.sh',
-                    \ 'for': ['py', 'java'],
+                    \ 'for': ['python', 'java'],
                     \ }
         Plug 'OmniSharp/omnisharp-vim', {'for': 'cs'}
         Plug 'OmniSharp/csharp-language-server-protocol', {'for': 'cs'}
+
+        let g:LanguageClient_serverCommands = {
+                    \ 'java': ['/usr/local/bin/jdtls', '-data', getcwd()],
+                    \ 'python': ['pyls'],
+                    \ }
+
+        function! LC_maps()
+            if has_key(g:LanguageClient_serverCommands, &filetype)
+                nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
+                nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
+                nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+                nnoremap <buffer> <silent> <Leader><space> :call LanguageClient_contextMenu()<CR>
+            endif
+        endfunction
+
+        autocmd FileType * call LC_maps()
 
         augroup omnisharp_commands
             autocmd!
@@ -172,58 +145,73 @@ filetype plugin indent on
 
             " Finds members in the current buffer
             autocmd FileType cs nnoremap <buffer> <Leader>fm :OmniSharpFindMembers<CR>
-
             autocmd FileType cs nnoremap <buffer> <Leader>fx :OmniSharpFixUsings<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>tt :OmniSharpTypeLookup<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>dc :OmniSharpDocumentation<CR>
-            autocmd FileType cs nnoremap <buffer> <C-\> :OmniSharpSignatureHelp<CR>
-            autocmd FileType cs inoremap <buffer> <C-\> <C-o>:OmniSharpSignatureHelp<CR>
-
-            " Navigate up and down by method/property/field
-            autocmd FileType cs nnoremap <buffer> <C-k> :OmniSharpNavigateUp<CR>
-            autocmd FileType cs nnoremap <buffer> <C-j> :OmniSharpNavigateDown<CR>
+            autocmd FileType cs nnoremap <Leader><space> :OmniSharpGetCodeActions<CR>
+            autocmd FileType cs nnoremap <F2> :OmniSharpRename<CR>
         augroup END
 
-        nnoremap <F6> :call LanguageClient_contextMenu()<CR>
-        let g:LanguageClient_serverCommands = {
-                    \ 'java': [g:userDirectory . '/jdtls', '-data', getcwd()],
-                    \ 'python': ['pyls'],
-                    \ }
+        let g:OmniSharp_server_stdio = 0
 
-        function LC_maps()
-            if has_key(g:LanguageClient_serverCommands, &filetype)
-                nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
-                nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-                nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-            endif
-        endfunction
+    " }
+    " Make and Test: {
+        Plug 'neomake/neomake'
+        Plug 'janko-m/vim-test'
+        Plug 'tpope/vim-projectionist'
+        Plug 'tpope/vim-dispatch'
 
-        autocmd FileType * call LC_maps()
+        let test#strategy = "dispatch"
+        let g:test#csharp#runner = "dotnettest"
+        nmap <silent> t<C-n> :TestNearest<CR>
+        nmap <silent> t<C-f> :TestFile<CR>
+        nmap <silent> t<C-s> :TestSuite<CR>
+        nmap <silent> t<C-l> :TestLast<CR>
+        nmap <silent> t<C-g> :TestVisit<CR>
+    " }
+    " Debug: {
+        Plug 'idanarye/vim-vebugger'
+        Plug 'Shougo/vimproc.vim', {'do' : 'make'}
     " }
     " Git: {
         Plug 'tpope/vim-fugitive'
         Plug 'ludovicchabant/vim-gutentags'
     " }
     " Finder: {
-        Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+        Plug 'junegunn/fzf'
         Plug 'junegunn/fzf.vim'
         Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
-        map <C-p> :Files<CR>
+        " Mapping selecting mappings
+        nmap <leader><tab> <plug>(fzf-maps-n)
+        xmap <leader><tab> <plug>(fzf-maps-x)
+        omap <leader><tab> <plug>(fzf-maps-o)
+
+        " Insert mode completion
+        imap <c-x><c-k> <plug>(fzf-complete-word)
+        imap <c-x><c-f> <plug>(fzf-complete-path)
+        imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+        imap <c-x><c-l> <plug>(fzf-complete-line)
         map <C-b> :TagbarToggle<CR>
     " }
     " Syntax: {
         Plug 'sheerun/vim-polyglot'
         Plug 'andymass/vim-matlab', {'for': 'matlab'}
+        Plug 'chrisbra/csv.vim'
+        Plug 'heaths/vim-msbuild'
     " }
     " Formatting: {
         Plug 'Yggdroot/indentLine'
         Plug 'rstacruz/vim-closer'
-        Plug 'scrooloose/nerdcommenter'
+        Plug 'tpope/vim-endwise'
+        Plug 'tpope/vim-commentary'
+        Plug 'prettier/vim-prettier'
+
+        au FileType cs
+                    \ let b:closer = 1 |
+                    \ let b:closer_flags = '([{'
     " }
 
     """ Buffer Manangement
     " NERD Tree: {
-        Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTreeFind', 'NERDTree']}
+        Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
         nmap <leader>n :NERDTreeToggle<CR>
     " }
     " Window Mangement: {
@@ -231,11 +219,38 @@ filetype plugin indent on
         Plug 'simeji/winresizer'
         Plug 'dhruvasagar/vim-zoom'
     " }
+    " Working Directory: {
+        Plug 'airblade/vim-rooter'
+
+        let g:rooter_patterns = ['.projectionist', '.git', '.git/', 'makefile']
+        let g:rooter_change_directory_for_non_project_files = 'current'
+    " }
     " Start Menu: {
         Plug 'mhinz/vim-startify'
     " }
+    " Timing Startup: {
+        Plug 'tweekmonster/startuptime.vim'
+    " }
 
     call plug#end()
+" }
+
+""" Post Plugin Load: {
+    " ALE: {
+        nmap <silent> <leader>aj :ALENext<cr>
+        nmap <silent> <leader>ak :ALEPrevious<cr>
+    " }
+    " Denite: {
+        call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>', 'noremap')
+        call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
+        call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>', 'noremap')
+        call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
+    " }
+    " Deoplete: {
+    " }
+    " NeoMake: {
+        call neomake#configure#automake('w')
+    " }
 " }
 
 """ Window Movement: {
@@ -250,26 +265,27 @@ filetype plugin indent on
 """ Basic Remapping: {
     inoremap jk <ESC>
     inoremap kj <ESC>
-    nmap <leader>s :w!<CR>
-    nmap <leader>q :q!<CR>
+    nmap <leader>s :w<CR>
+    nmap <leader>q :q<CR>
     nmap , za
     tnoremap <Esc> <C-\><C-n>
     tnoremap jk <C-\><C-n>
     tnoremap kj <C-\><C-n>
+    nmap <S-CR> O<Esc>
+    nmap  O<Esc>
+    nmap <CR> o<Esc>
 " }
 
 """ Function key remaps: {
     " Fix tab
     nnoremap <silent> <F3> mzgg=G`zzz
     " Run makefile
-    nnoremap <silent> <F4> :make<CR>
-    " Reload file
-    nnoremap <silent> <F5> :e %<CR>
+    nnoremap <silent> <F5> :make<CR>
 " }
 
 """ General: {
-    set backupdir=~/.config/nvim/backup,.
-    set directory=~/.config/nvim/backup,.
+    set backupdir=g:userDirectory.'/backup',.
+    set directory=g:userDirectory.'/backup',.
 " }
 
 """ Styling: {
@@ -296,4 +312,5 @@ filetype plugin indent on
     set ignorecase
     set nohlsearch
     set foldmethod=indent
+    set lazyredraw
 " }

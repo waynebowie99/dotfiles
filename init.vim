@@ -1,6 +1,7 @@
 "Space as learder
 let mapleader=" "
 
+set nocompatible
 filetype plugin indent on
 
 """ Init Config: {
@@ -8,8 +9,8 @@ filetype plugin indent on
         if has("unix")
             let g:vimDirectory = "~/.local/share/nvim/site"
             let g:userDirectory = "~/.config/nvim"
-        elseif has("win32") || has("win32unix")
-            let g:vimDirectory  = 'C:\Users\'. $username. '\AppData\Local\nvim'
+        else
+            let g:vimDirectory  = 'C:/Users/'. $username. '/AppData/Local/nvim'
             let g:userDirectory = g:vimDirectory
         end
     endif
@@ -23,24 +24,19 @@ filetype plugin indent on
         Plug 'vim-airline/vim-airline'
         Plug 'vim-airline/vim-airline-themes'
 
-        if has("unix")
-            let g:airline#extensions#tabline#enabled = 1
-        endif
-
         let g:airline_detect_modified= 1
-        let g:airline_detect_spell= 0
+        let g:airline_detect_spell= 1
         let g:airline_powerline_fonts = 1
-        let g:airline#extensions#wordcount#enabled = 0
-        let g:airline#extensions#whitespace#enabled = 0
+        let g:airline#extensions#wordcount#enabled = 1
+        let g:airline#extensions#whitespace#enabled = 1
 
         let g:airline#extensions#ale#enabled = 1
 
         let g:airline#extensions#tabline#buffer_nr_show = 0
         let g:airline#extensions#tabline#formatter = 'unique_tail'
 
-        let g:airline#extensions#languageclient#enabled = 0
-        let g:airline#extensions#neomake#enabled = 0
-        set laststatus=2
+        let g:airline#extensions#languageclient#enabled = 1
+        let g:airline#extensions#neomake#enabled = 1
     " }
     " Themeing: {
         Plug 'ryanoasis/vim-devicons'
@@ -57,6 +53,7 @@ filetype plugin indent on
                     \}
         let g:ale_fixers = {
                     \   '*':['trim_whitespace', 'remove_trailing_lines'],
+                    \   'xml':['tidy', 'trim_whitespace', 'remove_trailing_lines'],
                     \   'html':['prettier', 'trim_whitespace', 'remove_trailing_lines'],
                     \   'cs':['uncrustify', 'trim_whitespace', 'remove_trailing_lines'],
                     \   'java':['uncrustify', 'trim_whitespace', 'remove_trailing_lines'],
@@ -74,18 +71,6 @@ filetype plugin indent on
 
         inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
         inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-    " }
-    " Denite: {
-        Plug 'Shougo/denite.nvim'
-
-        nnoremap <leader>: :Denite command<CR>
-        nnoremap <leader>" :Denite register<CR>
-        nnoremap <leader>b :Denite buffer:!<CR>
-        nnoremap <leader>R :Denite file_mru<CR>
-        nnoremap <leader>/ :Denite grep:.<CR>
-    " }
-    " Emmet: {
-        Plug 'mattn/emmet-vim'
     " }
     " NeoSnippet: {
         Plug 'Shougo/neosnippet.vim'
@@ -124,7 +109,6 @@ filetype plugin indent on
         endfunction
 
         autocmd FileType * call LC_maps()
-
         augroup omnisharp_commands
             autocmd!
 
@@ -148,10 +132,15 @@ filetype plugin indent on
             autocmd FileType cs nnoremap <buffer> <Leader>fx :OmniSharpFixUsings<CR>
             autocmd FileType cs nnoremap <Leader><space> :OmniSharpGetCodeActions<CR>
             autocmd FileType cs nnoremap <F2> :OmniSharpRename<CR>
+
+            " Run Tests
+            autocmd FileType cs nnoremap <leader>rt :OmniSharpRunTests<cr>
+            autocmd FileType cs nnoremap <leader>rf :OmniSharpRunTestFixture<cr>
+            autocmd FileType cs nnoremap <leader>ra :OmniSharpRunAllTests<cr>
+            autocmd FileType cs nnoremap <leader>rl :OmniSharpRunLastTests<cr>
         augroup END
 
         let g:OmniSharp_server_stdio = 0
-
     " }
     " Make and Test: {
         Plug 'neomake/neomake'
@@ -160,7 +149,6 @@ filetype plugin indent on
         Plug 'tpope/vim-dispatch'
 
         let test#strategy = "dispatch"
-        let g:test#csharp#runner = "dotnettest"
         nmap <silent> t<C-n> :TestNearest<CR>
         nmap <silent> t<C-f> :TestFile<CR>
         nmap <silent> t<C-s> :TestSuite<CR>
@@ -168,7 +156,6 @@ filetype plugin indent on
         nmap <silent> t<C-g> :TestVisit<CR>
     " }
     " Debug: {
-        Plug 'idanarye/vim-vebugger'
         Plug 'Shougo/vimproc.vim', {'do' : 'make'}
     " }
     " Git: {
@@ -178,41 +165,43 @@ filetype plugin indent on
     " Finder: {
         Plug 'junegunn/fzf'
         Plug 'junegunn/fzf.vim'
-        Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
-        " Mapping selecting mappings
-        nmap <leader><tab> <plug>(fzf-maps-n)
-        xmap <leader><tab> <plug>(fzf-maps-x)
-        omap <leader><tab> <plug>(fzf-maps-o)
+        Plug 'majutsushi/tagbar'
 
-        " Insert mode completion
-        imap <c-x><c-k> <plug>(fzf-complete-word)
-        imap <c-x><c-f> <plug>(fzf-complete-path)
-        imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-        imap <c-x><c-l> <plug>(fzf-complete-line)
-        map <C-b> :TagbarToggle<CR>
+        let $FZF_DEFAULT_COMMAND='ag -g ""'
+
+        nmap <Leader>f :Files<CR>
+        nmap <Leader>g :GFiles<CR>
+        nmap <Leader>t :Tags<CR>
+        nmap <Leader>l :Lines<CR>
+        nnoremap <Leader>b :Buffers<CR>
+        map <Leader>mt :TagbarToggle<CR>
     " }
     " Syntax: {
         Plug 'sheerun/vim-polyglot'
         Plug 'andymass/vim-matlab', {'for': 'matlab'}
         Plug 'chrisbra/csv.vim'
         Plug 'heaths/vim-msbuild'
+
+        au BufRead,BufNewFile *.xaml setfiletype xml
     " }
     " Formatting: {
-        Plug 'Yggdroot/indentLine'
-        Plug 'rstacruz/vim-closer'
         Plug 'tpope/vim-endwise'
         Plug 'tpope/vim-commentary'
         Plug 'prettier/vim-prettier'
-
-        au FileType cs
-                    \ let b:closer = 1 |
-                    \ let b:closer_flags = '([{'
+        Plug 'Yggdroot/indentLine'
     " }
 
     """ Buffer Manangement
+    " Denite: {
+        Plug 'Shougo/denite.nvim'
+
+        nnoremap <leader>" :Denite register<CR>
+        nnoremap <leader>/ :Denite grep:.<CR>
+    " }
     " NERD Tree: {
         Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
         nmap <leader>n :NERDTreeToggle<CR>
+        let NERDTreeQuitOnOpen=1
     " }
     " Window Mangement: {
         Plug 'wesQ3/vim-windowswap'
@@ -241,12 +230,31 @@ filetype plugin indent on
         nmap <silent> <leader>ak :ALEPrevious<cr>
     " }
     " Denite: {
+        autocmd FileType denite call s:denite_my_settings()
+            function! s:denite_my_settings() abort
+              nnoremap <silent><buffer><expr> <CR>
+              \ denite#do_map('do_action')
+              nnoremap <silent><buffer><expr> d
+              \ denite#do_map('do_action', 'delete')
+              nnoremap <silent><buffer><expr> p
+              \ denite#do_map('do_action', 'preview')
+              nnoremap <silent><buffer><expr> q
+              \ denite#do_map('quit')
+              nnoremap <silent><buffer><expr> i
+              \ denite#do_map('open_filter_buffer')
+              nnoremap <silent><buffer><expr> <Space>
+              \ denite#do_map('toggle_select').'j'
+            endfunction
+
+            autocmd FileType denite-filter call s:denite_filter_my_settings()
+            function! s:denite_filter_my_settings() abort
+              imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)
+            endfunction
+
         call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>', 'noremap')
         call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
         call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>', 'noremap')
         call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
-    " }
-    " Deoplete: {
     " }
     " NeoMake: {
         call neomake#configure#automake('w')
@@ -264,16 +272,11 @@ filetype plugin indent on
 
 """ Basic Remapping: {
     inoremap jk <ESC>
-    inoremap kj <ESC>
     nmap <leader>s :w<CR>
     nmap <leader>q :q<CR>
     nmap , za
     tnoremap <Esc> <C-\><C-n>
     tnoremap jk <C-\><C-n>
-    tnoremap kj <C-\><C-n>
-    nmap <S-CR> O<Esc>
-    nmap  O<Esc>
-    nmap <CR> o<Esc>
 " }
 
 """ Function key remaps: {
@@ -283,9 +286,37 @@ filetype plugin indent on
     nnoremap <silent> <F5> :make<CR>
 " }
 
+""" ScrollView: {
+    set scrolloff=999
+    if !exists('*VCenterCursor')
+      augroup VCenterCursor
+      au!
+      au OptionSet *,*.*
+        \ if and( expand("<amatch>")=='scrolloff' ,
+        \         exists('#VCenterCursor#WinEnter,WinNew,VimResized') )|
+        \   au! VCenterCursor WinEnter,WinNew,VimResized|
+        \ endif
+      augroup END
+      function VCenterCursor()
+        if !exists('#VCenterCursor#WinEnter,WinNew,VimResized')
+          let s:default_scrolloff=&scrolloff
+          let &scrolloff=winheight(win_getid())/2
+          au VCenterCursor WinEnter,WinNew,VimResized *,*.*
+            \ let &scrolloff=winheight(win_getid())/2
+        else
+          au! VCenterCursor WinEnter,WinNew,VimResized
+          let &scrolloff=s:default_scrolloff
+        endif
+      endfunction
+    endif
+
+    nnoremap <leader>zz :call VCenterCursor()<CR>
+"}
+
 """ General: {
     set backupdir=g:userDirectory.'/backup',.
     set directory=g:userDirectory.'/backup',.
+    set mouse=
 " }
 
 """ Styling: {
@@ -304,7 +335,6 @@ filetype plugin indent on
     set tabstop=4
     set background=dark
     colorscheme desert
-    set guifont=Hack
     set guioptions-=m
     set guioptions-=T
     set guioptions-=r
@@ -313,4 +343,6 @@ filetype plugin indent on
     set nohlsearch
     set foldmethod=indent
     set lazyredraw
+
+    autocmd VimEnter * GuiFont! DejaVu\ Sans\ Mono\ for\ Powerline
 " }

@@ -5,15 +5,14 @@ set nocompatible
 filetype plugin indent on
 
 """ Init Config: {
-    if has("nvim")
-        if has("unix")
-            let g:vimDirectory = "~/.local/share/nvim/site"
-            let g:userDirectory = "~/.config/nvim"
-        else
-            let g:vimDirectory  = 'C:/Users/'. $username. '/AppData/Local/nvim'
-            let g:userDirectory = g:vimDirectory
-        end
-    endif
+    if has("unix")
+        let g:vimDirectory = "~/.local/share/nvim/site"
+        let g:userDirectory = "~/.config/nvim"
+    else
+        let g:vimDirectory  = "M:/swp/"
+        let g:userDirectory = g:vimDirectory
+        let g:python3_host_prog='C:\Python37\python.exe'
+    end
 " }
 
 """ Plugins: {
@@ -30,12 +29,11 @@ filetype plugin indent on
         let g:airline#extensions#wordcount#enabled = 1
         let g:airline#extensions#whitespace#enabled = 1
 
-        let g:airline#extensions#ale#enabled = 1
+        let g:airline#extensions#coc#enabled = 1
 
         let g:airline#extensions#tabline#buffer_nr_show = 0
         let g:airline#extensions#tabline#formatter = 'unique_tail'
 
-        let g:airline#extensions#languageclient#enabled = 1
         let g:airline#extensions#neomake#enabled = 1
     " }
     " Themeing: {
@@ -43,34 +41,115 @@ filetype plugin indent on
     " }
 
     """ Syntax/Formatting
-    " ALE: {
-        Plug 'w0rp/ale'
-
-        let g:ale_completion_enabled = 1
-        let g:ale_fix_on_save = 1
-        let g:ale_linters = {
-                    \   'cs':['OmniSharp']
-                    \}
-        let g:ale_fixers = {
-                    \   '*':['trim_whitespace', 'remove_trailing_lines'],
-                    \   'xml':['tidy', 'trim_whitespace', 'remove_trailing_lines'],
-                    \   'html':['prettier', 'trim_whitespace', 'remove_trailing_lines'],
-                    \   'cs':['uncrustify', 'trim_whitespace', 'remove_trailing_lines'],
-                    \   'java':['uncrustify', 'trim_whitespace', 'remove_trailing_lines'],
-                    \   'json':['prettier', 'trim_whitespace', 'remove_trailing_lines'],
-                    \}
-    " }
-    " Deoplete: {
-        Plug 'Shougo/deoplete.nvim'
-
-        let g:deoplete#enable_at_startup = 1
-        let g:deoplete#auto_complete_start_length = 1
-        if has('win32')
-            let g:python3_host_prog='C:\Python37\python.exe'
-        endif
-
+    " Auto Complete: {
         inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
         inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+        Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+
+        let g:coc_global_extensions=[ 'coc-omnisharp', 'coc-powershell', 'coc-json', 'coc-yank', 'coc-snippets', 'coc-marketplace', 'coc-highlight' ]
+        " if hidden is not set, TextEdit might fail.
+        set hidden
+
+        " Some servers have issues with backup files, see #649
+        set nobackup
+        set nowritebackup
+
+        " Better display for messages
+        set cmdheight=2
+
+        " You will have bad experience for diagnostic messages when it's default 4000.
+        set updatetime=300
+
+        " don't give |ins-completion-menu| messages.
+        set shortmess+=c
+
+        " Use <c-space> to trigger completion.
+        inoremap <silent><expr> <c-space> coc#refresh()
+
+        " Remap keys for gotos
+        nmap <silent> gd <Plug>(coc-definition)
+        nmap <silent> gy <Plug>(coc-type-definition)
+        nmap <silent> gi <Plug>(coc-implementation)
+        nmap <silent> gr <Plug>(coc-references)
+
+        " Use K to show documentation in preview window
+        nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+        function! s:show_documentation()
+          if (index(['vim','help'], &filetype) >= 0)
+            execute 'h '.expand('<cword>')
+          else
+            call CocAction('doHover')
+          endif
+        endfunction
+
+        " Highlight symbol under cursor on CursorHold
+        autocmd CursorHold * silent call CocActionAsync('highlight')
+
+        " Remap for rename current word
+        nmap <leader>rn <Plug>(coc-rename)
+
+        " Remap for format selected region
+        xmap <leader>cf  <Plug>(coc-format-selected)
+        nmap <leader>cf  <Plug>(coc-format-selected)
+
+        augroup mygroup
+          autocmd!
+          " Setup formatexpr specified filetype(s).
+          autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+          " Update signature help on jump placeholder
+          autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+        augroup end
+
+        " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+        xmap <leader>a  <Plug>(coc-codeaction-selected)
+        nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+        " Remap for do codeAction of current line
+        nmap <leader>ac  <Plug>(coc-codeaction)
+        " Fix autofix problem of current line
+        nmap <leader>qf  <Plug>(coc-fix-current)
+
+        " Create mappings for function text object, requires document symbols feature of languageserver.
+        xmap if <Plug>(coc-funcobj-i)
+        xmap af <Plug>(coc-funcobj-a)
+        omap if <Plug>(coc-funcobj-i)
+        omap af <Plug>(coc-funcobj-a)
+
+        " Use `:Format` to format current buffer
+        command! -nargs=0 Format :call CocAction('format')
+
+        " Use `:Fold` to fold current buffer
+        command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+        " use `:OR` for organize import of current buffer
+        command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+    " }
+    " Language Server {
+        Plug 'OmniSharp/omnisharp-vim', {'for': 'cs'}
+        Plug 'OmniSharp/csharp-language-server-protocol', {'for': 'cs'}
+        augroup omnisharp_commands
+            autocmd!
+
+            " Update the highlighting whenever leaving insert mode
+            autocmd InsertLeave *.cs call OmniSharp#HighlightBuffer()
+
+            " Alternatively, use a mapping to refresh highlighting for the current buffer
+            autocmd FileType cs nnoremap <buffer> <Leader>th :OmniSharpHighlightTypes<CR>
+
+            " The following commands are contextual, based on the cursor position.
+            autocmd FileType cs nnoremap <buffer> <Leader>fi :OmniSharpFindImplementations<CR>
+            autocmd FileType cs nnoremap <buffer> <Leader>fs :OmniSharpFindSymbol<CR>
+            autocmd FileType cs nnoremap <buffer> <Leader>fu :OmniSharpFindUsages<CR>
+
+            " Finds members in the current buffer
+            autocmd FileType cs nnoremap <buffer> <Leader>fm :OmniSharpFindMembers<CR>
+            autocmd FileType cs nnoremap <buffer> <Leader>fx :OmniSharpFixUsings<CR>
+            autocmd FileType cs nnoremap <Leader><space> :OmniSharpGetCodeActions<CR>
+        augroup END
+
+        let g:OmniSharp_server_stdio = 0
     " }
     " NeoSnippet: {
         Plug 'Shougo/neosnippet.vim'
@@ -84,63 +163,6 @@ filetype plugin indent on
                     \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
         let g:neosnippet#snippets_directory = '~/.config/nvim/plugged/neosnippet-snippets/neosnippets'
         let g:neosnippet#enable_snipmate_compatibility = 1
-    " }
-    " Language-Client: {
-        Plug 'autozimu/LanguageClient-neovim', {
-                    \ 'branch': 'future',
-                    \ 'do': 'bash install.sh',
-                    \ 'for': ['python', 'java'],
-                    \ }
-        Plug 'OmniSharp/omnisharp-vim', {'for': 'cs'}
-        Plug 'OmniSharp/csharp-language-server-protocol', {'for': 'cs'}
-
-        let g:LanguageClient_serverCommands = {
-                    \ 'java': ['/usr/local/bin/jdtls', '-data', getcwd()],
-                    \ 'python': ['pyls'],
-                    \ }
-
-        function! LC_maps()
-            if has_key(g:LanguageClient_serverCommands, &filetype)
-                nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
-                nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-                nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-                nnoremap <buffer> <silent> <Leader><space> :call LanguageClient_contextMenu()<CR>
-            endif
-        endfunction
-
-        autocmd FileType * call LC_maps()
-        augroup omnisharp_commands
-            autocmd!
-
-            " Show type information automatically when the cursor stops moving
-            autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-
-            " Update the highlighting whenever leaving insert mode
-            autocmd InsertLeave *.cs call OmniSharp#HighlightBuffer()
-
-            " Alternatively, use a mapping to refresh highlighting for the current buffer
-            autocmd FileType cs nnoremap <buffer> <Leader>th :OmniSharpHighlightTypes<CR>
-
-            " The following commands are contextual, based on the cursor position.
-            autocmd FileType cs nnoremap <buffer> gd :OmniSharpGotoDefinition<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>fi :OmniSharpFindImplementations<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>fs :OmniSharpFindSymbol<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>fu :OmniSharpFindUsages<CR>
-
-            " Finds members in the current buffer
-            autocmd FileType cs nnoremap <buffer> <Leader>fm :OmniSharpFindMembers<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>fx :OmniSharpFixUsings<CR>
-            autocmd FileType cs nnoremap <Leader><space> :OmniSharpGetCodeActions<CR>
-            autocmd FileType cs nnoremap <F2> :OmniSharpRename<CR>
-
-            " Run Tests
-            autocmd FileType cs nnoremap <leader>rt :OmniSharpRunTests<cr>
-            autocmd FileType cs nnoremap <leader>rf :OmniSharpRunTestFixture<cr>
-            autocmd FileType cs nnoremap <leader>ra :OmniSharpRunAllTests<cr>
-            autocmd FileType cs nnoremap <leader>rl :OmniSharpRunLastTests<cr>
-        augroup END
-
-        let g:OmniSharp_server_stdio = 0
     " }
     " Make and Test: {
         Plug 'neomake/neomake'
@@ -161,6 +183,10 @@ filetype plugin indent on
     " Git: {
         Plug 'tpope/vim-fugitive'
         Plug 'ludovicchabant/vim-gutentags'
+        Plug 'airblade/vim-gitgutter'
+    " }
+    " DataBase: {
+        Plug 'tpope/vim-dadbod'
     " }
     " Finder: {
         Plug 'junegunn/fzf'
@@ -190,6 +216,9 @@ filetype plugin indent on
         Plug 'prettier/vim-prettier'
         Plug 'Yggdroot/indentLine'
     " }
+    " Style: {
+        Plug 'ncm2/float-preview.nvim'
+    " }
 
     """ Buffer Manangement
     " Denite: {
@@ -211,7 +240,7 @@ filetype plugin indent on
     " Working Directory: {
         Plug 'airblade/vim-rooter'
 
-        let g:rooter_patterns = ['.projectionist', '.git', '.git/', 'makefile']
+        let g:rooter_patterns = ['**/*.sln', '.projections.json', '.git', '.git/', 'makefile']
         let g:rooter_change_directory_for_non_project_files = 'current'
     " }
     " Start Menu: {
@@ -219,6 +248,9 @@ filetype plugin indent on
     " }
     " Timing Startup: {
         Plug 'tweekmonster/startuptime.vim'
+    " }
+    " Reload: {
+        Plug 'djoshea/vim-autoread'
     " }
 
     call plug#end()

@@ -12,6 +12,7 @@ filetype plugin indent on
         let g:vimDirectory  = "M:/swp/"
         let g:userDirectory = g:vimDirectory
         let g:python3_host_prog='C:\Python37\python.exe'
+        autocmd VimEnter * GuiFont! DejaVu\ Sans\ Mono\ for\ Powerline
     end
 " }
 
@@ -318,33 +319,6 @@ filetype plugin indent on
     nnoremap <silent> <F5> :make<CR>
 " }
 
-""" ScrollView: {
-    set scrolloff=999
-    if !exists('*VCenterCursor')
-      augroup VCenterCursor
-      au!
-      au OptionSet *,*.*
-        \ if and( expand("<amatch>")=='scrolloff' ,
-        \         exists('#VCenterCursor#WinEnter,WinNew,VimResized') )|
-        \   au! VCenterCursor WinEnter,WinNew,VimResized|
-        \ endif
-      augroup END
-      function VCenterCursor()
-        if !exists('#VCenterCursor#WinEnter,WinNew,VimResized')
-          let s:default_scrolloff=&scrolloff
-          let &scrolloff=winheight(win_getid())/2
-          au VCenterCursor WinEnter,WinNew,VimResized *,*.*
-            \ let &scrolloff=winheight(win_getid())/2
-        else
-          au! VCenterCursor WinEnter,WinNew,VimResized
-          let &scrolloff=s:default_scrolloff
-        endif
-      endfunction
-    endif
-
-    nnoremap <leader>zz :call VCenterCursor()<CR>
-"}
-
 """ General: {
     set backupdir=g:userDirectory.'/backup',.
     set directory=g:userDirectory.'/backup',.
@@ -375,6 +349,4 @@ filetype plugin indent on
     set nohlsearch
     set foldmethod=indent
     set lazyredraw
-
-    autocmd VimEnter * GuiFont! DejaVu\ Sans\ Mono\ for\ Powerline
 " }

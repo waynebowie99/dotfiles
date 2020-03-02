@@ -9,10 +9,12 @@ filetype plugin indent on
         let g:vimDirectory = "~/.local/share/nvim/site"
         let g:userDirectory = "~/.config/nvim"
     else
-        let g:vimDirectory  = "M:/swp/"
+        let g:vimDirectory  = "~/Documents/swp/"
         let g:userDirectory = g:vimDirectory
         let g:python3_host_prog='C:\Python37\python.exe'
-        autocmd VimEnter * GuiFont! DejaVu\ Sans\ Mono\ for\ Powerline
+        "autocmd VimEnter * GuiFont! FantasqueSansMono\ Nerd\ Font\ Mono:h13
+        autocmd VimEnter * GuiPopupmenu 0
+        set guifont=FantasqueSansMono\ Nerd\ Font\ Mono:h13
     end
 " }
 
@@ -46,15 +48,17 @@ filetype plugin indent on
         inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
         inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-        Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+        Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-        let g:coc_global_extensions=[ 'coc-omnisharp', 'coc-powershell', 'coc-json', 'coc-yank', 'coc-snippets', 'coc-marketplace', 'coc-highlight' ]
+        let g:coc_global_extensions=[ 'coc-omnisharp', 'coc-powershell', 'coc-json', 'coc-yank', 'coc-snippets', 'coc-marketplace', 'coc-highlight', 'coc-git', 'coc-python' ]
+
         " if hidden is not set, TextEdit might fail.
         set hidden
 
         " Some servers have issues with backup files, see #649
         set nobackup
         set nowritebackup
+        set noswapfile
 
         " Better display for messages
         set cmdheight=2
@@ -112,6 +116,10 @@ filetype plugin indent on
         " Fix autofix problem of current line
         nmap <leader>qf  <Plug>(coc-fix-current)
 
+        " Goto errors
+        nmap <leader>ej <Plug>(coc-diagnostics-next-error)
+        nmap <leader>ek <Plug>(coc-diagnostics-previous-error)
+
         " Create mappings for function text object, requires document symbols feature of languageserver.
         xmap if <Plug>(coc-funcobj-i)
         xmap af <Plug>(coc-funcobj-a)
@@ -130,27 +138,30 @@ filetype plugin indent on
     " Language Server {
         Plug 'OmniSharp/omnisharp-vim', {'for': 'cs'}
         Plug 'OmniSharp/csharp-language-server-protocol', {'for': 'cs'}
+        let g:OmniSharp_server_stdio = 0
+        let g:OmniSharp_highlight_types = 2
+
         augroup omnisharp_commands
             autocmd!
 
-            " Update the highlighting whenever leaving insert mode
-            autocmd InsertLeave *.cs call OmniSharp#HighlightBuffer()
-
-            " Alternatively, use a mapping to refresh highlighting for the current buffer
-            autocmd FileType cs nnoremap <buffer> <Leader>th :OmniSharpHighlightTypes<CR>
-
-            " The following commands are contextual, based on the cursor position.
-            autocmd FileType cs nnoremap <buffer> <Leader>fi :OmniSharpFindImplementations<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>fs :OmniSharpFindSymbol<CR>
-            autocmd FileType cs nnoremap <buffer> <Leader>fu :OmniSharpFindUsages<CR>
-
-            " Finds members in the current buffer
-            autocmd FileType cs nnoremap <buffer> <Leader>fm :OmniSharpFindMembers<CR>
             autocmd FileType cs nnoremap <buffer> <Leader>fx :OmniSharpFixUsings<CR>
             autocmd FileType cs nnoremap <Leader><space> :OmniSharpGetCodeActions<CR>
-        augroup END
 
-        let g:OmniSharp_server_stdio = 0
+            autocmd FileType cs nnoremap <buffer> ]m :OmniSharpNavigateDown<cr>
+            autocmd FileType cs nnoremap <buffer> [m :OmniSharpNavigateUp<cr>
+            autocmd FileType cs nnoremap <buffer> ]M :OmniSharpNavigateDown<cr>
+            autocmd FileType cs nnoremap <buffer> [M :OmniSharpNavigateUp<cr>
+
+            autocmd FileType cs xnoremap <buffer> ]m :OmniSharpNavigateDown<cr>
+            autocmd FileType cs xnoremap <buffer> [m :OmniSharpNavigateUp<cr>
+            autocmd FileType cs xnoremap <buffer> ]M :OmniSharpNavigateDown<cr>
+            autocmd FileType cs xnoremap <buffer> [M :OmniSharpNavigateUp<cr>
+
+            autocmd FileType cs onoremap <buffer> ]m :OmniSharpNavigateDown<cr>
+            autocmd FileType cs onoremap <buffer> [m :OmniSharpNavigateUp<cr>
+            autocmd FileType cs onoremap <buffer> ]M :OmniSharpNavigateDown<cr>
+            autocmd FileType cs onoremap <buffer> [M :OmniSharpNavigateUp<cr>
+        augroup END
     " }
     " NeoSnippet: {
         Plug 'Shougo/neosnippet.vim'
@@ -177,6 +188,7 @@ filetype plugin indent on
         nmap <silent> t<C-s> :TestSuite<CR>
         nmap <silent> t<C-l> :TestLast<CR>
         nmap <silent> t<C-g> :TestVisit<CR>
+        let test#csharp#runner = 'dotnettest'
     " }
     " Debug: {
         Plug 'Shougo/vimproc.vim', {'do' : 'make'}
@@ -201,9 +213,10 @@ filetype plugin indent on
         nmap <Leader>t :Tags<CR>
         nmap <Leader>l :Lines<CR>
         nnoremap <Leader>b :Buffers<CR>
-        map <Leader>mt :TagbarToggle<CR>
+        map <Leader>mt :TagbarOpenAutoClose<CR>
     " }
     " Syntax: {
+        Plug 'wlangstroth/vim-racket'
         Plug 'sheerun/vim-polyglot'
         Plug 'andymass/vim-matlab', {'for': 'matlab'}
         Plug 'chrisbra/csv.vim'
@@ -218,7 +231,11 @@ filetype plugin indent on
         Plug 'Yggdroot/indentLine'
     " }
     " Style: {
-        Plug 'ncm2/float-preview.nvim'
+        Plug 'morhetz/gruvbox'
+        Plug 'TaDaa/vimade'
+
+		Plug 'camspiers/animate.vim'
+		Plug 'camspiers/lens.vim'
     " }
 
     """ Buffer Manangement
@@ -241,7 +258,7 @@ filetype plugin indent on
     " Working Directory: {
         Plug 'airblade/vim-rooter'
 
-        let g:rooter_patterns = ['**/*.sln', '.projections.json', '.git', '.git/', 'makefile']
+        let g:rooter_patterns = ['**/*.sln', '.projections.json', 'makefile', '.git', '.git/']
         let g:rooter_change_directory_for_non_project_files = 'current'
     " }
     " Start Menu: {
@@ -258,10 +275,6 @@ filetype plugin indent on
 " }
 
 """ Post Plugin Load: {
-    " ALE: {
-        nmap <silent> <leader>aj :ALENext<cr>
-        nmap <silent> <leader>ak :ALEPrevious<cr>
-    " }
     " Denite: {
         autocmd FileType denite call s:denite_my_settings()
             function! s:denite_my_settings() abort
@@ -320,8 +333,8 @@ filetype plugin indent on
 " }
 
 """ General: {
-    set backupdir=g:userDirectory.'/backup',.
-    set directory=g:userDirectory.'/backup',.
+    set backupdir=g:userDirectory,.
+    set directory=g:userDirectory,.
     set mouse=
 " }
 
@@ -340,12 +353,7 @@ filetype plugin indent on
     set softtabstop=4
     set tabstop=4
     set background=dark
-    colorscheme desert
-    set guioptions-=m
-    set guioptions-=T
-    set guioptions-=r
-    set guioptions-=L
-    set ignorecase
+    colorscheme gruvbox
     set nohlsearch
     set foldmethod=indent
     set lazyredraw

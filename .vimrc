@@ -6,23 +6,18 @@ filetype plugin indent on
 
 """ Init Config: {
     if has("unix")
-        if has("nvim")
-            if empty(glob('~/.config/nvim/autoload/plug.vim'))
-                silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-                autocmd VimEnter * PlugInstall --sync
-                source $MYVIMRC
-            endif
-        else
-        end
+        if empty(glob('~/.vim/autoload/plug.vim'))
+            silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+            autocmd VimEnter * PlugInstall --sync
+            source $MYVIMRC
+        endif
     else
-        let g:python3_host_prog='C:\Python38\python.exe'
-        let $HOME = $USERPROFILE
-    end
+        set shell=powershell
+    endif
 
     if has("gui_running")
         set guioptions=i
         set guifont=FantasqueSansMono_Nerd_Font_Mon:h12
-        "au GUIEnter * simalt ~x
     endif
 " }
 
@@ -43,11 +38,9 @@ filetype plugin indent on
         let g:airline#extensions#coc#enabled = 1
         let g:airline#extensions#csv#enabled = 1
         let g:airline#extensions#branch#enabled = 1
-        let g:airline#extensions#dirvish#enabled = 1
         let g:airline#extensions#fugitiveline#enable = 1
         let g:airline#extensions#gutentags#enabled = 1
         let g:airline#extensions#term#enable = 1
-
     " }
 
     """ Syntax/Formatting
@@ -61,23 +54,10 @@ filetype plugin indent on
 
         let g:coc_global_extensions=['coc-vimlsp', 'coc-restclient', 'coc-lists', 'coc-powershell', 'coc-json', 'coc-yank', 'coc-snippets', 'coc-marketplace', 'coc-highlight']
 
-        " inoremap <silent><expr> <TAB>
-        "             \ pumvisible() ? \"\<C-n>" :
-        "             \ <SID>check_back_space() ? \"\<TAB>" :
-        "             \ coc#refresh()
-        " inoremap <expr><S-TAB> pumvisible() ? \"\<C-p>" : \"\<C-h>"
-
         function! s:check_back_space() abort
             let col = col('.') - 1
             return !col || getline('.')[col - 1]  =~# '\s'
         endfunction
-
-        if has("patch-8.1.1564")
-            " Recently vim can merge signcolumn and number column into one
-            set signcolumn=number
-        else
-            set signcolumn=yes
-        endif
 
         " Use K to show documentation in preview window.
         nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -109,30 +89,16 @@ filetype plugin indent on
         nnoremap <leader>cp :CocPrev<CR>
     " }
     " Lang Server:{
-        Plug 'OmniSharp/Omnisharp-vim'
+        Plug 'OmniSharp/Omnisharp-vim', { 'for': 'cs' }
         let g:OmniSharp_server_stdio = 0
 
-        if has('patch-8.1.1880')
-            set completeopt=longest,menuone,popuphidden
-            " Highlight the completion documentation popup background/foreground the same as
-            " the completion menu itself, for better readability with highlighted
-            " documentation.
-            set completepopup=highlight:Pmenu,border:off
-        else
-            set completeopt=longest,menuone,preview
-            " Set desired preview window height for viewing documentation.
-            set previewheight=5
-        endif
+        set completeopt=longest,menuone,popuphidden
+        set completepopup=highlight:Pmenu,border:off
 
         augroup omnisharp_commands
             autocmd!
 
-            " Show type information automatically when the cursor stops moving.
-            " Note that the type is echoed to the Vim command line, and will overwrite
-            " any other messages in this space including e.g. ALE linting messages.
             autocmd CursorHold *.cs OmniSharpTypeLookup
-
-            " The following commands are contextual, based on the cursor position.
             autocmd FileType cs nmap <silent> <buffer> gd <Plug>(omnisharp_go_to_definition)
             autocmd FileType cs nmap <silent> <buffer> <Leader>osfu <Plug>(omnisharp_find_usages)
             autocmd FileType cs nmap <silent> <buffer> <Leader>osfi <Plug>(omnisharp_find_implementations)
@@ -225,31 +191,16 @@ filetype plugin indent on
         nnoremap <leader>m :Clap marks<CR>
         nnoremap <leader>y :Clap yanks<CR>
     "}
-    " Movement: {
-        Plug 'justinmk/vim-sneak'
-        Plug 'kshenoy/vim-signature'
-        let g:sneak#use_ic_scs = 1
-        map f <Plug>Sneak_f
-        map F <Plug>Sneak_F
-        map t <Plug>Sneak_t
-        map T <Plug>Sneak_T
-    "}
     " Tpope: {
         Plug 'tpope/vim-projectionist'
         Plug 'tpope/vim-dispatch'
         Plug 'tpope/vim-unimpaired'
-        Plug 'tpope/vim-eunuch'
         Plug 'tpope/vim-repeat'
-        Plug 'tpope/vim-dotenv'
-    " }
-    " Database: {
-        Plug 'tpope/vim-dadbod'
-        Plug 'kristijanhusak/vim-dadbod-ui'
     " }
     " Syntax: {
         Plug 'sheerun/vim-polyglot'
-        Plug 'kevinoid/vim-jsonc'
-        Plug 'chrisbra/csv.vim'
+        Plug 'kevinoid/vim-jsonc', { 'for': 'json' }
+        Plug 'chrisbra/csv.vim', { 'for': 'csv' }
         Plug 'yggdroot/indentline'
         au BufRead,BufNewFile *.xaml setfiletype xml
     " }
@@ -258,6 +209,7 @@ filetype plugin indent on
     " }
     " Style: {
         Plug 'morhetz/gruvbox'
+        Plug 'osyo-manga/vim-over'
     " }
 
     """ Buffer Manangement
@@ -269,6 +221,7 @@ filetype plugin indent on
     " }
     " Start Menu: {
         Plug 'mhinz/vim-startify'
+
         nnoremap <leader>sm :Startify<CR>
         nnoremap <leader>sc :SClose<CR>
         nnoremap <leader>ss :SSave<CR>
@@ -280,15 +233,6 @@ filetype plugin indent on
     " }
 
     call plug#end()
-" }
-
-""" Window Movement: {
-    nnoremap <C-J> <C-W><C-J>
-    nnoremap <C-K> <C-W><C-K>
-    nnoremap <C-L> <C-W><C-L>
-    nnoremap <C-H> <C-W><C-H>
-    set splitbelow
-    set splitright
 " }
 
 """ Function key remaps: {
@@ -327,7 +271,6 @@ filetype plugin indent on
     syntax on
     set encoding=utf8
     set mouse=
-    set ttymouse=
     set autoindent
     set copyindent
     set backspace=indent,eol,start
@@ -340,17 +283,13 @@ filetype plugin indent on
     set shiftwidth=4
     set softtabstop=4
     set tabstop=4
+    set shortmess=a
     colorscheme gruvbox
     set background=dark
     set nohls
     set hidden
-    "set cmdheight=2
-    "set updatetime=300
-    "set shortmess+=c
     set lazyredraw
     set autoread
-    "set linebreak
-    "set wildmenu
     set foldmethod=indent
     set nofoldenable
     set backup
@@ -359,4 +298,7 @@ filetype plugin indent on
     set directory=.swp/,~/.swp/,/tmp//
     set undofile
     set undodir=.undo/,~/.undo/,/tmp//
+    set splitbelow
+    set splitright
+    set signcolumn=yes
 " }

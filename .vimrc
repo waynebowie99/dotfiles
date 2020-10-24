@@ -12,7 +12,7 @@ filetype plugin indent on
             source $MYVIMRC
         endif
     else
-        set shell=powershell
+        " set shell=powershell
     endif
 
     if has("gui_running")
@@ -32,68 +32,29 @@ filetype plugin indent on
         let g:airline_detect_modified = 1
         let g:airline_powerline_fonts = 1
 
+        let g:airline_section_c = '%F'
+
         let g:airline#extensions#wordcount#enabled = 1
         let g:airline#extensions#whitespace#enabled = 1
         let g:airline#extensions#bookmark#enabled = 1
-        let g:airline#extensions#coc#enabled = 1
         let g:airline#extensions#csv#enabled = 1
         let g:airline#extensions#branch#enabled = 1
         let g:airline#extensions#fugitiveline#enable = 1
         let g:airline#extensions#gutentags#enabled = 1
+        let g:airline#extensions#omnisharp#enabled = 1
+        let g:airline#extensions#syntastic#enabled = 1
         let g:airline#extensions#term#enable = 1
     " }
 
     """ Syntax/Formatting
-    " Completion: {
-        Plug 'lifepillar/vim-mucomplete'
-        Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-        let g:mucomplete#no_mappings = 0
-        let g:mucomplete#enable_auto_at_startup = 1
-        let g:mucomplete#completion_delay = 1
-
-        let g:coc_global_extensions=['coc-vimlsp', 'coc-restclient', 'coc-lists', 'coc-powershell', 'coc-json', 'coc-yank', 'coc-snippets', 'coc-marketplace', 'coc-highlight']
-
-        function! s:check_back_space() abort
-            let col = col('.') - 1
-            return !col || getline('.')[col - 1]  =~# '\s'
-        endfunction
-
-        " Use K to show documentation in preview window.
-        nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-        function! s:show_documentation()
-            if (index(['vim','help'], &filetype) >= 0)
-                execute 'h '.expand('<cword>')
-            else
-                call CocAction('doHover')
-            endif
-        endfunction
-
-        " Remap keys for gotos
-        "nmap <silent> gd <Plug>(coc-definition)
-        nmap <silent> <leader>cgy <Plug>(coc-type-definition)
-        nmap <silent> <leader>cgi <Plug>(coc-implementation)
-        nmap <silent> <leader>cgr <Plug>(coc-references)
-
-        autocmd CursorHold * silent call CocActionAsync('highlight')
-        nmap <leader>rn <Plug>(coc-rename)
-        nmap <leader>ca  <Plug>(coc-codeaction)
-        nnoremap <silent> <leader>a  :CocList diagnostics<cr>
-        nnoremap <silent> <leader>aj <Plug>(coc-diagnostic-next)
-        nnoremap <silent> <leader>ak <Plug>(coc-diagnostic-prev)
-
-        nnoremap <leader>cl :CocList<CR>
-        nnoremap <leader>cr :CocRestart<CR>
-        nnoremap <leader>cn :CocNext<CR>
-        nnoremap <leader>cp :CocPrev<CR>
-    " }
     " Lang Server:{
         Plug 'OmniSharp/Omnisharp-vim', { 'for': 'cs' }
         let g:OmniSharp_server_stdio = 0
-
-        set completeopt=longest,menuone,popuphidden
-        set completepopup=highlight:Pmenu,border:off
+        let g:OmniSharp_diagnostic_showid = 1
+        let g:OmniSharp_selector_ui = 'fzf'
+        let g:Omnisharp_want_snippet = 1
+        let g:OmniSharp_open_quickfix = 0
+        let g:omnicomplete_fetch_full_documentation = 0
 
         augroup omnisharp_commands
             autocmd!
@@ -135,9 +96,26 @@ filetype plugin indent on
         Plug 'skywind3000/asyncrun.vim'
         Plug 'skywind3000/asynctasks.vim'
 
-        let g:asyncrun_open = 6
+        let g:asyncrun_open = 0
 
-        let test#strategy = 'asyncrun_background_term'
+        function! RefreshUI()
+            if exists(':AirlineRefresh')
+                AirlineRefresh
+            else
+                " Clear & redraw the screen, then redraw all statuslines.
+                redraw!
+                redrawstatus!
+            endif
+        endfunction
+
+        let g:asyncrun_exit = 'call RefreshUI()'
+        autocmd VimEnter * let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
+
+        nmap <silent> <leader>as :AsyncStop<CR>
+        nmap <silent> <leader>ar :AsyncTask run<CR>
+        nmap <silent> <leader>ab :AsyncTask build<CR>
+
+        let test#strategy = 'asyncrun'
         let test#csharp#runner = 'dotnettest'
         nmap <silent> <leader>tn :TestNearest<CR>
         nmap <silent> <leader>tf :TestFile<CR>
@@ -177,46 +155,103 @@ filetype plugin indent on
         nnoremap <leader>dg :diffget<CR>
     " }
     " File Management: {
-        Plug 'liuchengxu/vim-clap', { 'do': ':Clap install-binary!' }
+        Plug 'tpope/vim-vinegar'
+        Plug 'liuchengxu/vim-clap', { 'do': ':call clap#installer#download_binary()' }
         Plug 'liuchengxu/vista.vim'
         Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 
-        nnoremap <leader>e :Clap filer<CR>
+        nnoremap <leader>e :Explore<CR>
         nnoremap <leader>f :Clap files<CR>
-        nnoremap <leader>t :Clap proj_tags<CR>
+        nnoremap <leader>TT :Clap proj_tags<CR>
         nnoremap <leader>T :Clap tags<CR>
         nnoremap <leader>b :Clap buffers<CR>
-        nnoremap <leader>/ :Clap grep2<CR>
+        nnoremap <leader>/ :Clap grep ++query=<cword><CR>
+        nnoremap <leader>// :Clap grep<CR>
         nnoremap <leader>h :Clap help_tags<CR>
         nnoremap <leader>m :Clap marks<CR>
         nnoremap <leader>y :Clap yanks<CR>
+        nnoremap <leader>r :Clap registers<CR>
+        nnoremap <leader>l :Clap lines<CR>
+        nnoremap <leader>qf :Clap quickfix<CR>
     "}
     " Tpope: {
         Plug 'tpope/vim-projectionist'
         Plug 'tpope/vim-dispatch'
         Plug 'tpope/vim-unimpaired'
         Plug 'tpope/vim-repeat'
+        Plug 'tpope/vim-eunuch'
+        Plug 'tpope/vim-rsi'
     " }
     " Syntax: {
         Plug 'sheerun/vim-polyglot'
-        Plug 'kevinoid/vim-jsonc', { 'for': 'json' }
-        Plug 'chrisbra/csv.vim', { 'for': 'csv' }
+        Plug 'sirtaj/vim-openscad', { 'for': 'scad' }
+        Plug 'vim-syntastic/syntastic'
+        Plug 'kevinoid/vim-jsonc'
+        Plug 'chrisbra/csv.vim'
         Plug 'yggdroot/indentline'
+        Plug 'jiangmiao/auto-pairs'
+        Plug 'SirVer/ultisnips'
+        Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+        let g:syntastic_always_populate_loc_list = 1
+        let g:syntastic_auto_loc_list = 0
+        let g:syntastic_check_on_open = 1
+        let g:syntastic_check_on_wq = 0
+
+        let g:syntastic_cs_checkers = ['code_checker']
+
         au BufRead,BufNewFile *.xaml setfiletype xml
+
+        let g:coc_global_extensions=['coc-python', 'coc-tasks', 'coc-html', 'coc-vimlsp', 'coc-restclient', 'coc-lists', 'coc-powershell', 'coc-json', 'coc-yank', 'coc-snippets', 'coc-marketplace', 'coc-highlight']
+        nmap <silent> <leader>cgy <Plug>(coc-type-definition)
+        nmap <silent> <leader>cgi <Plug>(coc-implementation)
+        nmap <silent> <leader>cgr <Plug>(coc-references)
+
+        autocmd CursorHold * silent call CocActionAsync('highlight')
+        nmap <leader>rn <Plug>(coc-rename)
+        nmap <leader>ca  <Plug>(coc-codeaction)
+        nnoremap <silent> <leader>a  :CocList diagnostics<CR>
+        nnoremap <silent> <leader>aj <Plug>(coc-diagnostic-next)
+        nnoremap <silent> <leader>ak <Plug>(coc-diagnostic-prev)
+
+        nnoremap <leader>cl :CocList<CR>
+        nnoremap <leader>at :CocList tasks<CR>
+        nnoremap <leader>cr :CocRestart<CR>
+        nnoremap <leader>cn :CocNext<CR>
+        nnoremap <leader>cp :CocPrev<CR>
+
+    " }
+    " Movement: {
+        Plug 'justinmk/vim-sneak'
+        map f <Plug>Sneak_f
+        map F <Plug>Sneak_F
+        map t <Plug>Sneak_t
+        map T <Plug>Sneak_T
+
+        vmap f <Plug>Sneak_f
+        vmap F <Plug>Sneak_F
+        vmap t <Plug>Sneak_t
+        vmap T <Plug>Sneak_T
+        let g:sneak#label = 1
+        let g:sneak#use_ic_scs = 1
+    " }
+    " Vim Helpers: {
+        Plug 'mbbill/undotree'
+
+        nnoremap <leader>ut :UndotreeToggle<CR>
     " }
     " Formatting: {
         Plug 'tomtom/tcomment_vim'
     " }
     " Style: {
         Plug 'morhetz/gruvbox'
-        Plug 'osyo-manga/vim-over'
     " }
 
     """ Buffer Manangement
     " Working Directory: {
         Plug 'airblade/vim-rooter'
 
-        let g:rooter_patterns = ['*.sln', '.projections.json', 'makefile', '.git', '.git/']
+        let g:rooter_patterns = ['*.csproj', '*.sln', '.projections.json', 'Makefile', '.git', '.git/']
         let g:rooter_change_directory_for_non_project_files = 'current'
     " }
     " Start Menu: {
@@ -226,6 +261,8 @@ filetype plugin indent on
         nnoremap <leader>sc :SClose<CR>
         nnoremap <leader>ss :SSave<CR>
         nnoremap <leader>sl :SLoad<CR>
+
+        let g:startify_skiplist= ['\\192.168.167*', '\\192.168.165*']
     " }
     " Themeing: {
         " Must be loaded after other plugins to be usable
@@ -236,13 +273,18 @@ filetype plugin indent on
 " }
 
 """ Function key remaps: {
-    " Fix tab
-    nnoremap <silent> <F3> mzgg=G`zzz
-    " Run makefile
-    nnoremap <silent> <F5> :make<CR>
 " }
 
 """ Functions: {
+    nnoremap <silent> <leader>br :call job_start(BuildRun())<CR>
+    function BuildRun()
+        :AsyncStop
+        :AsyncTask build
+        while g:asyncrun_status == 'running'
+            sleep 50m
+        endwhile
+        :AsyncTask run
+    endfunction
 "}
 
 """ AutoCMD: {
@@ -256,7 +298,8 @@ filetype plugin indent on
 "}
 
 """ Mappings: {
-    nnoremap , za 
+    nnoremap <leader>co :copen<CR>
+    nnoremap <leader>cc :cclose<CR>
     nnoremap <C-W>\ <C-W>\| <C-W>_
     nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 
@@ -298,7 +341,7 @@ filetype plugin indent on
     set directory=.swp/,~/.swp/,/tmp//
     set undofile
     set undodir=.undo/,~/.undo/,/tmp//
-    set splitbelow
-    set splitright
     set signcolumn=yes
+    set completeopt=menuone,noselect,noinsert,preview
+    set completepopup=highlight:Pmenu,border:off
 " }

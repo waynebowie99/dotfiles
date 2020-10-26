@@ -22,6 +22,10 @@ let mapleader=" "
 """ Plugins: {
     call plug#begin()
 
+    Plug 'prabirshrestha/vim-lsp'
+    Plug 'mattn/vim-lsp-settings'
+    Plug 'prabirshrestha/asyncomplete.vim'
+    Plug 'prabirshrestha/asyncomplete-lsp.vim'
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
     Plug 'puremourning/vimspector'
@@ -43,8 +47,6 @@ let mapleader=" "
     Plug 'yggdroot/indentline'
     Plug 'jiangmiao/auto-pairs'
     Plug 'SirVer/ultisnips'
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    " Plug 'OmniSharp/Omnisharp-vim', { 'for': 'cs' }
     Plug 'justinmk/vim-sneak'
     Plug 'mbbill/undotree'
     Plug 'tomtom/tcomment_vim'
@@ -73,7 +75,6 @@ let mapleader=" "
         let g:airline#extensions#fugitiveline#enable = 1
         let g:airline#extensions#gutentags#enabled = 1
         let g:airline#extensions#term#enable = 1
-        let g:airline#extensions#coc#enabled = 1
     "}
 
     """ AsyncTask: {
@@ -107,32 +108,6 @@ let mapleader=" "
         nnoremap <silent> <leader>ab :AsyncTask build<CR>
     "}
     "
-    " Coc: {
-        let g:coc_global_extensions=['coc-omnisharp', 'coc-tsserver', 'coc-python', 'coc-tasks', 'coc-html', 'coc-vimlsp', 'coc-restclient', 'coc-lists', 'coc-powershell', 'coc-json', 'coc-yank', 'coc-snippets', 'coc-marketplace', 'coc-highlight']
-
-        inoremap <silent><expr> <c-space> coc#refresh()
-
-        nmap <silent> <leader>cgi <Plug>(coc-implementation)
-        nmap <silent> <leader>cgr <Plug>(coc-references)
-        nmap <silent> <leader>cgd <Plug>(coc-declaration)
-        nnoremap <leader>cfm <Plug>(coc-format)
-        nnoremap <leader>cqf <Plug>(coc-fix-current)
-        nnoremap <leader>cca <Plug>(coc-codelens-action)
-        nnoremap <leader>crf <Plug>(coc-refactor)
-
-        autocmd CursorHold * silent call CocActionAsync('highlight')
-        nmap <leader>crn <Plug>(coc-rename)
-        nnoremap <leader>ca :CocAction<CR>
-        vnoremap <leader>ca :CocAction<CR>
-        nnoremap <silent> <leader>cd :CocList diagnostics<CR>
-
-        nnoremap <leader>cs :CocSearch -SLwe 
-        nnoremap <leader>cl :CocList<CR>
-        nnoremap <leader>at :CocList tasks<CR>
-        nnoremap <leader>cr :CocRestart<CR>
-        nnoremap <leader>cn :CocNext<CR>
-        nnoremap <leader>cp :CocPrev<CR>
-    " }
 
     """ Startify: {
         nnoremap <leader>sm :Startify<CR>
@@ -141,49 +116,6 @@ let mapleader=" "
         nnoremap <leader>sl :SLoad<CR>
 
         let g:startify_skiplist= ['\\192.168.167*', '\\192.168.165*']
-    "}
-
-    """ Omnisharp: {
-        " let g:OmniSharp_server_stdio = 0
-        " let g:OmniSharp_diagnostic_showid = 1
-        " let g:OmniSharp_selector_ui = 'fzf'
-        " let g:Omnisharp_want_snippet = 1
-        " let g:OmniSharp_open_quickfix = 0
-        " let g:omnicomplete_fetch_full_documentation = 1
-        "
-        " augroup omnisharp_commands
-        "     autocmd!
-        "
-        "     autocmd CursorHold *.cs OmniSharpTypeLookup
-        "     autocmd FileType cs nmap <silent> <buffer> gd <Plug>(omnisharp_go_to_definition)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osfu <Plug>(omnisharp_find_usages)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osfi <Plug>(omnisharp_find_implementations)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>ospd <Plug>(omnisharp_preview_definition)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>ospi <Plug>(omnisharp_preview_implementations)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>ost <Plug>(omnisharp_type_lookup)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osd <Plug>(omnisharp_documentation)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osfs <Plug>(omnisharp_find_symbol)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osfx <Plug>(omnisharp_fix_usings)
-        "     autocmd FileType cs nmap <silent> <buffer> <C-\> <Plug>(omnisharp_signature_help)
-        "     autocmd FileType cs imap <silent> <buffer> <C-\> <Plug>(omnisharp_signature_help)
-        "
-        "     " Navigate up and down by method/property/field
-        "     autocmd FileType cs nmap <silent> <buffer> [[ <Plug>(omnisharp_navigate_up)
-        "     autocmd FileType cs nmap <silent> <buffer> ]] <Plug>(omnisharp_navigate_down)
-        "     " Find all code errors/warnings for the current solution and populate the quickfix window
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osgcc <Plug>(omnisharp_global_code_check)
-        "     " Contextual code actions (uses fzf, CtrlP or unite.vim when available)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osca <Plug>(omnisharp_code_actions)
-        "     autocmd FileType cs xmap <silent> <buffer> <Leader>osca <Plug>(omnisharp_code_actions)
-        "
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>os= <Plug>(omnisharp_code_format)
-        "
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osrn <Plug>(omnisharp_rename)
-        "
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osre <Plug>(omnisharp_restart_server)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>osst <Plug>(omnisharp_start_server)
-        "     autocmd FileType cs nmap <silent> <buffer> <Leader>ossp <Plug>(omnisharp_stop_server)
-        " augroup END
     "}
 
     """ Undotree: {

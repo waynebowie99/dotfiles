@@ -22,21 +22,16 @@ let mapleader=" "
 """ Plugins: {
     call plug#begin()
 
-    Plug 'prabirshrestha/vim-lsp'
-    Plug 'mattn/vim-lsp-settings'
-    Plug 'prabirshrestha/asyncomplete.vim'
-    Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
+    Plug 'liuchengxu/vim-clap', { 'do': ':call clap#installer#download_binary()' } | Plug 'liuchengxu/vista.vim' | Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+    Plug 'prabirshrestha/vim-lsp' | Plug 'mattn/vim-lsp-settings' | Plug 'prabirshrestha/asyncomplete.vim' | Plug 'prabirshrestha/asyncomplete-lsp.vim'
+    Plug 'OmniSharp/Omnisharp-vim', { 'for': ['cs', 'vbnet'] }
+    Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
     Plug 'puremourning/vimspector'
     Plug 'janko-m/vim-test'
     Plug 'skywind3000/asyncrun.vim' | Plug 'skywind3000/asynctasks.vim'
-    Plug 'airblade/vim-gitgutter'
     Plug 'tpope/vim-fugitive'
     Plug 'ludovicchabant/vim-gutentags'
     Plug 'tpope/vim-vinegar'
-    Plug 'liuchengxu/vim-clap', { 'do': ':call clap#installer#download_binary()' } | Plug 'liuchengxu/vista.vim'
-    Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
     Plug 'tpope/vim-projectionist'
     Plug 'tpope/vim-unimpaired'
     Plug 'tpope/vim-repeat'
@@ -45,12 +40,9 @@ let mapleader=" "
     Plug 'sirtaj/vim-openscad'
     Plug 'kevinoid/vim-jsonc'
     Plug 'yggdroot/indentline'
-    Plug 'jiangmiao/auto-pairs'
     Plug 'SirVer/ultisnips'
-    Plug 'justinmk/vim-sneak'
     Plug 'mbbill/undotree'
     Plug 'tomtom/tcomment_vim'
-    Plug 'airblade/vim-rooter'
     Plug 'morhetz/gruvbox'
     Plug 'mhinz/vim-startify'
 
@@ -65,8 +57,6 @@ let mapleader=" "
         let g:airline_detect_modified = 1
         let g:airline_powerline_fonts = 1
 
-        let g:airline_section_c = '%F'
-
         let g:airline#extensions#wordcount#enabled = 1
         let g:airline#extensions#whitespace#enabled = 1
         let g:airline#extensions#bookmark#enabled = 1
@@ -75,6 +65,7 @@ let mapleader=" "
         let g:airline#extensions#fugitiveline#enable = 1
         let g:airline#extensions#gutentags#enabled = 1
         let g:airline#extensions#term#enable = 1
+        let g:airline#extensions#omnisharp#enabled = 1
     "}
 
     """ AsyncTask: {
@@ -107,19 +98,18 @@ let mapleader=" "
         nnoremap <silent> <leader>ar :AsyncTask run<CR>
         nnoremap <silent> <leader>ab :AsyncTask build<CR>
     "}
-    "
-
-    """ Startify: {
-        nnoremap <leader>sm :Startify<CR>
-        nnoremap <leader>sc :SClose<CR>
-        nnoremap <leader>ss :SSave!<CR>
-        nnoremap <leader>sl :SLoad<CR>
-
-        let g:startify_skiplist= ['\\192.168.167*', '\\192.168.165*']
-    "}
 
     """ Undotree: {
         nnoremap <leader>ut :UndotreeToggle<CR>
+    "}
+
+    """ Vim-Fugitive: {
+        nnoremap <leader>gb :Gblame<CR>
+        nnoremap <leader>gl :Glog<CR>
+        nnoremap <leader>gd :Gdiff<CR>
+        nnoremap <leader>gg :G<CR>
+
+        nnoremap <leader>dg :diffget<CR>
     "}
 
     """ Vim-Clap: {
@@ -137,23 +127,78 @@ let mapleader=" "
         nnoremap <leader>qf :Clap quickfix<CR>
     "}
 
-    """ Vim-Fugitive: {
-        nnoremap <leader>gb :Gblame<CR>
-        nnoremap <leader>gl :Glog<CR>
-        nnoremap <leader>gd :Gdiff<CR>
-        nnoremap <leader>gg :G<CR>
+    """ Omnisharp: {
+        let g:OmniSharp_server_stdio = 0
+        let g:OmniSharp_diagnostic_showid = 1
+        let g:OmniSharp_selector_ui = 'fzf'
+        let g:Omnisharp_want_snippet = 1
+        let g:OmniSharp_open_quickfix = 1
+        let g:omnicomplete_fetch_full_documentation = 0
 
-        nnoremap <leader>dg :diffget<CR>
+        augroup omnisharp_commands
+            autocmd!
+
+            autocmd CursorHold *.cs OmniSharpTypeLookup
+            autocmd FileType cs nmap <silent> <buffer> gd <Plug>(omnisharp_go_to_definition)
+            autocmd FileType cs nmap <silent> <buffer> gr <Plug>(omnisharp_find_usages)
+            autocmd FileType cs nmap <silent> <buffer> gi <Plug>(omnisharp_find_implementations)
+            autocmd FileType cs nmap <silent> <buffer> <Leader>gd <Plug>(omnisharp_preview_definition)
+            autocmd FileType cs nmap <silent> <buffer> <Leader>gi <Plug>(omnisharp_preview_implementations)
+            autocmd FileType cs nmap <silent> <buffer> gt <Plug>(omnisharp_type_lookup)
+            autocmd FileType cs nmap <silent> <buffer> K <Plug>(omnisharp_documentation)
+            autocmd FileType cs nmap <silent> <buffer> gs <Plug>(omnisharp_find_symbol)
+            autocmd FileType cs nmap <silent> <buffer> <Leader>fx <Plug>(omnisharp_fix_usings)
+            autocmd FileType cs nmap <silent> <buffer> <C-\> <Plug>(omnisharp_signature_help)
+
+            " Navigate up and down by method/property/field
+            autocmd FileType cs nmap <silent> <buffer> [[ <Plug>(omnisharp_navigate_up)
+            autocmd FileType cs nmap <silent> <buffer> ]] <Plug>(omnisharp_navigate_down)
+            " Find all code errors/warnings for the current solution and populate the quickfix window
+            autocmd FileType cs nmap <silent> <buffer> ge <Plug>(omnisharp_global_code_check)
+            " Contextual code actions (uses fzf, CtrlP or unite.vim when available)
+            autocmd FileType cs nmap <silent> <buffer> <Leader>ca <Plug>(omnisharp_code_actions)
+            autocmd FileType cs xmap <silent> <buffer> <Leader>ca <Plug>(omnisharp_code_actions)
+
+            autocmd FileType cs nmap <silent> <buffer> <Leader>rn <Plug>(omnisharp_rename)
+
+            autocmd FileType cs nmap <silent> <buffer> <Leader>osre <Plug>(omnisharp_restart_server)
+            autocmd FileType cs nmap <silent> <buffer> <Leader>osst <Plug>(omnisharp_start_server)
+            autocmd FileType cs nmap <silent> <buffer> <Leader>ossp <Plug>(omnisharp_stop_server)
+        augroup END
     "}
 
-    """ Vim-Rooter: {
-        let g:rooter_patterns = ['*.csproj', '*.sln', '.projections.json', 'Makefile', '.git', '.git/']
-        let g:rooter_change_directory_for_non_project_files = 'current'
-    "}
+    """ Vim-Lsp: {
+        function! s:on_lsp_buffer_enabled() abort
+            setlocal omnifunc=lsp#complete
+            if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
 
-    """ Vim-Sneak: {
-        let g:sneak#label = 1
-        let g:sneak#use_ic_scs = 1
+            let g:lsp_signs_enabled = 0
+            let g:lsp_diagnostics_echo_cursor = 1
+            let g:lsp_diagnostics_float_cursor = 1
+
+            nmap <buffer> gd <plug>(lsp-definition)
+            nmap <buffer> <leader>gd <plug>(lsp-peek-definition)
+            nmap <buffer> gr <plug>(lsp-references)
+            nmap <buffer> gi <plug>(lsp-implementation)
+            nmap <buffer> <leader>gi <Plug>(lsp-peek-implementation)
+            nmap <buffer> <leader>gi <plug>(lsp-peek-implementation)
+            nmap <buffer> gt <plug>(lsp-type-definition)
+            nmap <buffer> <leader>gt <plug>(lsp-peek-type-definition)
+            nmap <buffer> <leader>rn <plug>(lsp-rename)
+            nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
+            nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
+            nmap <buffer> K <Plug>(lsp-hover)
+            nmap <buffer> <leader>ca <Plug>(lsp-code-action)
+            nmap <buffer> <leader>cl <Plug>(lsp-code-lens)
+            nmap <buffer> ge <Plug>(lsp-document-diagnostics)
+            
+        endfunction
+
+        augroup lsp_install
+            au!
+            " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+            autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+        augroup END
     "}
 
     """ Vim-Test: {
@@ -194,7 +239,7 @@ let mapleader=" "
 
 """ Commands: {
     ":R [command]
-    :command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+    command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 "}
 
 """ Mappings: {
@@ -219,9 +264,6 @@ let mapleader=" "
     set backspace=indent,eol,start
     set smartcase
     set ignorecase
-    set ruler
-    set nu
-    set rnu
     set expandtab
     set shiftwidth=4
     set softtabstop=4
@@ -229,7 +271,6 @@ let mapleader=" "
     set shortmess=a
     colorscheme gruvbox
     set background=dark
-    set nohls
     set hidden
     set lazyredraw
     set autoread
@@ -237,11 +278,13 @@ let mapleader=" "
     set nofoldenable
     set backup
     set writebackup
+    set incsearch
+    set nohlsearch
     set backupdir=.backup/,~/.backup/,/tmp//
     set directory=.swp/,~/.swp/,/tmp//
     set undofile
     set undodir=.undo/,~/.undo/,/tmp//
-    set signcolumn=yes
     set completeopt=menuone,noselect,noinsert,preview
     set completepopup=highlight:Pmenu,border:off
+    set path +=**
 " }
